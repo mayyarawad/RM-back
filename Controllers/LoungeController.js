@@ -1,11 +1,3 @@
-const express = require('express');
-const cors = require('cors');
-const { sql, config } = require('./db');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
 // إضافة صالة جديدة
  async function AddLounge(req, res) {
     const {
@@ -66,7 +58,4 @@ app.use(express.json());
         res.status(500).send("حدث خطأ أثناء إضافة الصالة");
     }
 };
-
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
-});
+module.exports = { AddLounge };
