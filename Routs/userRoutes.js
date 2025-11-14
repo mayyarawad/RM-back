@@ -4,13 +4,14 @@ const {
   register,
   getAllUsers,
 } = require("../Controllers/userController");
+const { AddLounge } = require("../Controllers/LoungeController");
 const router = express.Router();
 
 // User Registration Route
 router.post("/signin", signIn);
 router.get("/getUsers", getAllUsers);
 router.post("/register", register);
-// router.post("/AddLounge", AddLounge);s
+router.post("/AddLounge", AddLounge);s
 
 
 module.exports = router;
