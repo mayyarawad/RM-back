@@ -5,6 +5,7 @@ const {
   getAllUsers,
 } = require("../Controllers/userController");
 
+const { AddLounge, UpdateLounge, InActiveLounge, SelectAllLounge, SelectAllLoungeToServiceAdmin, ShowLoungeImage, DeleteLoungeImage, UpdateLoungeImage, AddLoungeImage } = require("../Controllers/LoungeController");
 const { AddCenterType, UpdateCenterType, InActiveCenterType, SelectCenterType, AddServiceCenter, UpdateServiceCenter, InactiveServiceCenter, SelectAllServiceCenter, SelectAllServiceCenterToServiceAdmin, AddServiceCenterImage, DeleteServiceCenterImage, UpdateServiceCenterImage, ShowServiceCenterImage } = require("../Controllers/CenterController");
 const { AddCar, UpdateCar, ShowALLCar , AddCarImage, UpdateCarImage, DeleteCarImage, ShowCarImage, AddFlower, UpdateFlower, ShowAllFlower, ShowFlowerImage, DeleteFlowerImage, UpdateFlowerImage, AddFlowerImage, AddHairModels, UpdateHairModels, DeleteHairModels, ShowHairModels , DeleteFlower, DeleteCar, AddHairModelsImage, UpdateHairModelsImage, DeleteHairModelsImage, ShowHairModelsImage, ShowALLCarToServiceCenter, ShowAllFlowerToServiceCenter, ShowHairModelsToServiceCenter, AddShoes, UpdateShoes, DeleteShoes, ShowAllShoes , ShowAllShoesToServiceCenter } = require("../Controllers/ServiceController");
 
@@ -15,6 +16,19 @@ router.post("/signin", signIn);
 router.get("/getUsers", getAllUsers);
 router.post("/register", register);
 
+
+// Lounge Management Route
+router.post("/AddLounge",AddLounge);
+router.put("/UpdateLounge/:loungeID",UpdateLounge);
+router.put("/DeleteLounge/:loungeID",InActiveLounge);
+router.get("/SelectAllLounge",SelectAllLounge);
+router.get("/SelectAllLoungeToServiceAdmin/:adminID",SelectAllLoungeToServiceAdmin);
+
+//Lounge Image Management Route
+router.post("/AddLoungeImage",AddLoungeImage);
+router.put("/UpdateLoungeImage/:imageID",UpdateLoungeImage);
+router.delete("/DeleteLoungeImage/:imageID",DeleteLoungeImage);
+router.get("/ShowLoungeImage/:loungeID",ShowLoungeImage);
 
 //Center Type Management Route
 router.post("/AddCenterType",AddCenterType);
