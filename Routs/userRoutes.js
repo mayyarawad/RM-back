@@ -4,14 +4,17 @@ const {
   register,
   getAllUsers,
 } = require("../Controllers/userController");
-const { AddLounge } = require("../Controllers/LoungeController");
+
+const { AddCenterType, UpdateCenterType, InActiveCenterType, SelectCenterType, AddServiceCenter, UpdateServiceCenter, InactiveServiceCenter, SelectAllServiceCenter, SelectAllServiceCenterToServiceAdmin, AddServiceCenterImage, DeleteServiceCenterImage, UpdateServiceCenterImage, ShowServiceCenterImage } = require("../Controllers/CenterController");
+const { AddCar, UpdateCar, ShowALLCar , AddCarImage, UpdateCarImage, DeleteCarImage, ShowCarImage, AddFlower, UpdateFlower, ShowAllFlower, ShowFlowerImage, DeleteFlowerImage, UpdateFlowerImage, AddFlowerImage, AddHairModels, UpdateHairModels, DeleteHairModels, ShowHairModels , DeleteFlower, DeleteCar, AddHairModelsImage, UpdateHairModelsImage, DeleteHairModelsImage, ShowHairModelsImage, ShowALLCarToServiceCenter, ShowAllFlowerToServiceCenter, ShowHairModelsToServiceCenter, AddShoes, UpdateShoes, DeleteShoes, ShowAllShoes , ShowAllShoesToServiceCenter } = require("../Controllers/ServiceController");
+
 const router = express.Router();
 
 // User Registration Route
 router.post("/signin", signIn);
 router.get("/getUsers", getAllUsers);
 router.post("/register", register);
-router.post("/AddLounge", AddLounge);
+
 
 //Center Type Management Route
 router.post("/AddCenterType",AddCenterType);
@@ -31,7 +34,6 @@ router.post("/AddServiceCenterImage",AddServiceCenterImage);
 router.put("/UpdateServiceCenterImage/:imageID",UpdateServiceCenterImage);
 router.delete("/DeleteServiceCenterImage/:imageID",DeleteServiceCenterImage);
 router.get("/ShowServiceCenterImage/:centerID",ShowServiceCenterImage);
-
 
 //Car Management Route
 router.post("/AddCar",AddCar);
