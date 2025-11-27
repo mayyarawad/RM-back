@@ -840,13 +840,13 @@ async function ShowAllShoes(req, res) {
 
 //عرض الأحذية لمركز معين
 async function ShowAllShoesToServiceCenter(req, res) {
-    const adminID = req.params.adminID;
+    const centerID = req.params.centerID;
 
     try {
         const pool = await connectDB();
 
         const result = await pool.request()
-            .input('AdminID', sql.Int, adminID)
+            .input('CenterID', sql.Int, centerID)
             .query(`
                 SELECT 
                     S.ID,
@@ -857,7 +857,7 @@ async function ShowAllShoesToServiceCenter(req, res) {
                     SC.Name AS Center_Name
                 FROM Shoes S
                 INNER JOIN Service_Center SC ON S.Center_ID = SC.ID
-                WHERE  C.Center_ID = @CenterID
+                WHERE  SC.Center_ID = @CenterID
             `);
 
         res.json(result.recordset);
@@ -868,6 +868,1214 @@ async function ShowAllShoesToServiceCenter(req, res) {
     }
 
 }
+
+//  إضافة صور حذاء جديدة
+async function AddShoesImage(req, res) {
+ const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                INSERT INTO Service_Images (Src_Image, Service_Type, Service_ID)
+                VALUES (@Src_Image, 'Shoes', @Service_ID)
+            `);
+
+        res.send("✔ تم إضافة صورة الحذاء بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة الصورة");
+    }
+};
+
+//  تعديل صور حذاء 
+async function UpdateShoesImage(req, res) {
+    const imageID = req.params.imageID;
+    const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                UPDATE Service_Images
+                SET 
+                    Src_Image = @Src_Image,
+                    Service_Type = 'Shoes',
+                    Service_ID = @Service_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم تعديل الصورة بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل الصورة");
+    }
+};
+
+//  حذف صور حذاء
+async function DeleteShoesImage(req, res) {
+     const imageID = req.params.imageID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .query(`
+                DELETE FROM Service_Images
+                WHERE ID = @ID AND Service_Type = 'Shoes'
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم حذف صورة الحذاء بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف الصورة");
+    }
+};
+
+//  عرض صور الحذاء
+async function ShowShoesImage(req, res) {
+    const ShoesID = req.params.ShoesID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ShoesID', sql.Int, ShoesID)
+            .query(`
+                SELECT 
+                    ID,
+                    Src_Image,
+                    Service_Type,
+                    Service_ID
+                FROM Service_Images
+                WHERE Service_ID = @ShoesID AND Service_Type = 'Shoes'
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ حدث خطأ أثناء جلب صور الحذاء");
+    }
+};
+
+//إضافة إكسسوار جديد
+async function AddAccessories(req, res) {
+    const { Type, Pieces, Price, Center_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input('Type', sql.VarChar, Type)
+            .input('Pieces', sql.VarChar, Pieces)
+            .input('Price', sql.Money, Price)
+            .input('Center_ID', sql.Int, Center_ID)
+            .query(`
+                INSERT INTO Accessories (Type, Pieces, Price, Center_ID)
+                VALUES (@Type, @Pieces, @Price, @Center_ID)
+            `);
+
+        res.send("✔ تمت إضافة الإكسسوار بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة الإكسسوار");
+    }
+};
+
+//تعديل اكسسوار
+async function UpdateAccessories(req, res) {
+    const accessoryID = req.params.accessoryID;
+    const { Type, Pieces, Price, Center_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, accessoryID)
+            .input('Type', sql.VarChar, Type)
+            .input('Pieces', sql.VarChar, Pieces)
+            .input('Price', sql.Money, Price)
+            .input('Center_ID', sql.Int, Center_ID)
+            .query(`
+                UPDATE Accessories
+                SET Type = @Type,
+                    Pieces = @Pieces,
+                    Price = @Price,
+                    Center_ID = @Center_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الإكسسوار غير موجود");
+
+        res.send("✔ تم تعديل الإكسسوار بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل الإكسسوار");
+    }
+};
+
+//حذف اكسسوار
+async function DeleteAccessories(req, res) {
+    const accessoryID = req.params.accessoryID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, accessoryID)
+            .query(`
+                DELETE FROM Accessories
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الإكسسوار غير موجود");
+
+        res.send("✔ تم حذف الإكسسوار");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف الإكسسوار");
+    }
+};
+
+//عرض جميع الاكسسوارات
+async function ShowAccessories(req, res) {
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .query(`
+                SELECT 
+                    A.ID,
+                    A.Type,
+                    A.Pieces,
+                    A.Price,
+                    SC.Name AS Center_Name
+                FROM Accessories A
+                LEFT JOIN Service_Center SC ON A.Center_ID = SC.ID
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب الإكسسوارات");
+    }
+};
+
+//عرض جميع الاكسسوارات لمركز معين
+async function ShowAccessoriesToServiceCenter(req, res) {
+    const CenterID = req.params.CenterID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('CenterID', sql.Int, CenterID)
+            .query(`
+                SELECT 
+                    A.ID,
+                    A.Type,
+                    A.Pieces,
+                    A.Price,
+                    SC.Name AS Center_Name
+                FROM Accessories A
+                INNER JOIN Service_Center SC ON A.Center_ID = SC.ID
+                WHERE SC.Center_ID = @CenterID
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب الإكسسوارات الخاصة بمركز");
+    }
+};
+
+//  إضافة صور اكسسوار جديدة
+async function AddAccessoriesImage(req, res) {
+ const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                INSERT INTO Service_Images (Src_Image, Service_Type, Service_ID)
+                VALUES (@Src_Image, 'Accessories', @Service_ID)
+            `);
+
+        res.send("✔ تم إضافة صورة الاكسسوار بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة الصورة");
+    }
+};
+
+//  تعديل صور الاكسسوار 
+async function UpdateAccessoriesImage(req, res) {
+    const imageID = req.params.imageID;
+    const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                UPDATE Service_Images
+                SET 
+                    Src_Image = @Src_Image,
+                    Service_Type = 'Accessories',
+                    Service_ID = @Service_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم تعديل الصورة بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل الصورة");
+    }
+};
+
+//  حذف صور الاكسسوار
+async function DeleteAccessoriesImage(req, res) {
+     const imageID = req.params.imageID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .query(`
+                DELETE FROM Service_Images
+                WHERE ID = @ID AND Service_Type = 'Accessories'
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم حذف صورة الاكسسوار بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف الصورة");
+    }
+};
+
+//  عرض صور الاكسسوار
+async function ShowAccessoriesImage(req, res) {
+    const AccessoriesID = req.params.AccessoriesID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('AccessoriesID', sql.Int, AccessoriesID)
+            .query(`
+                SELECT 
+                    ID,
+                    Src_Image,
+                    Service_Type,
+                    Service_ID
+                FROM Service_Images
+                WHERE Service_ID = @AccessoriesID AND Service_Type = 'Accessories'
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ حدث خطأ أثناء جلب صور الاكسسوار");
+    }
+};
+
+//إضافة فستان
+async function AddDress(req, res) {
+    const {
+        Fabric_Type,
+        Size,
+        Rent,
+        Buy,
+        Rent_Price,
+        Buy_Price,
+        Color,
+        Length,
+        Center_ID
+    } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input('Fabric_Type', sql.VarChar, Fabric_Type)
+            .input('Size', sql.Int, Size)
+            .input('Rent', sql.Bit, Rent)
+            .input('Buy', sql.Bit, Buy)
+            .input('Rent_Price', sql.Money, Rent_Price)
+            .input('Buy_Price', sql.Money, Buy_Price)
+            .input('Color', sql.VarChar, Color)
+            .input('Length', sql.Int, Length)
+            .input('Center_ID', sql.Int, Center_ID)
+            .query(`
+                INSERT INTO Dress (
+                    Fabric_Type, Size, Rent, Buy, Rent_Price,
+                    Buy_Price, Color, Length, Center_ID
+                ) VALUES (
+                    @Fabric_Type, @Size, @Rent, @Buy, @Rent_Price,
+                    @Buy_Price, @Color, @Length, @Center_ID
+                )
+            `);
+
+        res.send("✔ تم إضافة الفستان بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة الفستان");
+    }
+};
+
+// تعديل فستان
+async function UpdateDress(req, res) {
+    const dressID = req.params.dressID;
+
+    const {
+        Fabric_Type,
+        Size,
+        Rent,
+        Buy,
+        Rent_Price,
+        Buy_Price,
+        Color,
+        Length,
+        Center_ID
+    } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, dressID)
+            .input('Fabric_Type', sql.VarChar, Fabric_Type)
+            .input('Size', sql.Int, Size)
+            .input('Rent', sql.Bit, Rent)
+            .input('Buy', sql.Bit, Buy)
+            .input('Rent_Price', sql.Money, Rent_Price)
+            .input('Buy_Price', sql.Money, Buy_Price)
+            .input('Color', sql.VarChar, Color)
+            .input('Length', sql.Int, Length)
+            .input('Center_ID', sql.Int, Center_ID)
+            .query(`
+                UPDATE Dress
+                SET Fabric_Type = @Fabric_Type,
+                    Size = @Size,
+                    Rent = @Rent,
+                    Buy = @Buy,
+                    Rent_Price = @Rent_Price,
+                    Buy_Price = @Buy_Price,
+                    Color = @Color,
+                    Length = @Length,
+                    Center_ID = @Center_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الفستان غير موجود");
+
+        res.send("✔ تم تعديل الفستان بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل الفستان");
+    }
+};
+
+//حذف فستان
+async function DeleteDress(req, res) {
+    const dressID = req.params.dressID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, dressID)
+            .query(`
+                DELETE FROM Dress WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الفستان غير موجود");
+
+        res.send("✔ تم حذف الفستان");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف الفستان");
+    }
+};
+
+//عرض جميع الفساتين
+async function ShowDress(req, res) {
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request().query(`
+            SELECT
+                D.ID,
+                D.Fabric_Type,
+                D.Size,
+                D.Rent,
+                D.Buy,
+                D.Rent_Price,
+                D.Buy_Price,
+                D.Color,
+                D.Length,
+                SC.Name AS Center_Name
+            FROM Dress D
+            LEFT JOIN Service_Center SC ON D.Center_ID = SC.ID
+        `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب الفساتين");
+    }
+};
+
+//عرض جميع الفساتين لمركز معين
+async function ShowDressToServiceCenter(req, res) {
+    const centerID = req.params.centerID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('CenterID', sql.Int, centerID)
+            .query(`
+                SELECT
+                    D.ID,
+                    D.Fabric_Type,
+                    D.Size,
+                    D.Rent,
+                    D.Buy,
+                    D.Rent_Price,
+                    D.Buy_Price,
+                    D.Color,
+                    D.Length,
+                    SC.Name AS Center_Name
+                FROM Dress D
+                INNER JOIN Service_Center SC ON D.Center_ID = SC.ID
+                WHERE D.Center_ID = @CenterID
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب فساتين المتجر");
+    }
+};
+
+//  إضافة صور فستان جديدة
+async function AddDressImage(req, res) {
+ const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                INSERT INTO Service_Images (Src_Image, Service_Type, Service_ID)
+                VALUES (@Src_Image, 'Dress', @Service_ID)
+            `);
+
+        res.send("✔ تم إضافة صورة فستان بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة الصورة");
+    }
+};
+
+//  تعديل صور فستان 
+async function UpdateDressImage(req, res) {
+    const imageID = req.params.imageID;
+    const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                UPDATE Service_Images
+                SET 
+                    Src_Image = @Src_Image,
+                    Service_Type = 'Dress',
+                    Service_ID = @Service_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم تعديل الصورة بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل الصورة");
+    }
+};
+
+//  حذف صور فستان
+async function DeleteDressImage(req, res) {
+     const imageID = req.params.imageID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .query(`
+                DELETE FROM Service_Images
+                WHERE ID = @ID AND Service_Type = 'Dress'
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم حذف صورة فستان بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف الصورة");
+    }
+};
+
+//  عرض صور فستان
+async function ShowDressImage(req, res) {
+    const DressID = req.params.DressID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('DressID', sql.Int, DressID)
+            .query(`
+                SELECT 
+                    ID,
+                    Src_Image,
+                    Service_Type,
+                    Service_ID
+                FROM Service_Images
+                WHERE Service_ID = @DressID AND Service_Type = 'Dress'
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ حدث خطأ أثناء جلب صور الفستان");
+    }
+};
+
+//إضافة فستان زفاف
+async function AddWeddingDress(req, res) {
+    const {
+        Fabric_Type,
+        Size,
+        Type,
+        Rent,
+        Buy,
+        Rent_Price,
+        Buy_Price,
+        Bridal_Veil_Length,
+        Bridal_Veil_Fabric_Type,
+        Center_ID
+    } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input("Fabric_Type", sql.VarChar, Fabric_Type)
+            .input("Size", sql.Int, Size)
+            .input("Type", sql.VarChar, Type)
+            .input("Rent", sql.Bit, Rent)
+            .input("Buy", sql.Bit, Buy)
+            .input("Rent_Price", sql.Money, Rent_Price)
+            .input("Buy_Price", sql.Money, Buy_Price)
+            .input("Bridal_Veil_Length", sql.Int, Bridal_Veil_Length)
+            .input("Bridal_Veil_Fabric_Type", sql.VarChar, Bridal_Veil_Fabric_Type)
+            .input("Center_ID", sql.Int, Center_ID)
+            .query(`
+                INSERT INTO Wedding_Dress (
+                    Fabric_Type, Size, Type, Rent, Buy,
+                    Rent_Price, Buy_Price,
+                    Bridal_Veil_Length, Bridal_Veil_Fabric_Type,
+                    Center_ID
+                ) VALUES (
+                    @Fabric_Type, @Size, @Type, @Rent, @Buy,
+                    @Rent_Price, @Buy_Price,
+                    @Bridal_Veil_Length, @Bridal_Veil_Fabric_Type,
+                    @Center_ID
+                )
+            `);
+
+        res.send("✔ تم إضافة فستان الزفاف بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة فستان الزفاف");
+    }
+}
+
+//تعديل فستان زفاف
+async function UpdateWeddingDress(req, res) {
+    const dressID = req.params.dressID;
+
+    const {
+        Fabric_Type,
+        Size,
+        Type,
+        Rent,
+        Buy,
+        Rent_Price,
+        Buy_Price,
+        Bridal_Veil_Length,
+        Bridal_Veil_Fabric_Type,
+        Center_ID
+    } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input("ID", sql.Int, dressID)
+            .input("Fabric_Type", sql.VarChar, Fabric_Type)
+            .input("Size", sql.Int, Size)
+            .input("Type", sql.VarChar, Type)
+            .input("Rent", sql.Bit, Rent)
+            .input("Buy", sql.Bit, Buy)
+            .input("Rent_Price", sql.Money, Rent_Price)
+            .input("Buy_Price", sql.Money, Buy_Price)
+            .input("Bridal_Veil_Length", sql.Int, Bridal_Veil_Length)
+            .input("Bridal_Veil_Fabric_Type", sql.VarChar, Bridal_Veil_Fabric_Type)
+            .input("Center_ID", sql.Int, Center_ID)
+            .query(`
+                UPDATE Wedding_Dress
+                SET 
+                    Fabric_Type = @Fabric_Type,
+                    Size = @Size,
+                    Type = @Type,
+                    Rent = @Rent,
+                    Buy = @Buy,
+                    Rent_Price = @Rent_Price,
+                    Buy_Price = @Buy_Price,
+                    Bridal_Veil_Length = @Bridal_Veil_Length,
+                    Bridal_Veil_Fabric_Type = @Bridal_Veil_Fabric_Type,
+                    Center_ID = @Center_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ فستان الزفاف غير موجود");
+
+        res.send("✔ تم تعديل فستان الزفاف بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل فستان الزفاف");
+    }
+}
+
+//حذف فستان زفاف
+async function DeleteWeddingDress(req, res) {
+    const dressID = req.params.dressID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input("ID", sql.Int, dressID)
+            .query(`DELETE FROM Wedding_Dress WHERE ID = @ID`);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ فستان الزفاف غير موجود");
+
+        res.send("✔ تم حذف فستان الزفاف");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف فستان الزفاف");
+    }
+}
+
+//عرض جميع فساتين الزفاف
+async function ShowWeddingDress(req, res) {
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request().query(`
+            SELECT 
+                W.ID,
+                W.Fabric_Type,
+                W.Size,
+                W.Type,
+                W.Rent,
+                W.Buy,
+                W.Rent_Price,
+                W.Buy_Price,
+                W.Bridal_Veil_Length,
+                W.Bridal_Veil_Fabric_Type,
+                SC.Name AS Center_Name
+            FROM Wedding_Dress W
+            LEFT JOIN Service_Center SC ON W.Center_ID = SC.ID
+        `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب فساتين الزفاف");
+    }
+}
+
+//عرض جميع فساتين الزفاف لمركز معين
+async function ShowWeddingDressToServiceCenter(req, res) {
+    const centerID = req.params.centerID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input("CenterID", sql.Int, centerID)
+            .query(`
+                SELECT 
+                    W.ID,
+                    W.Fabric_Type,
+                    W.Size,
+                    W.Type,
+                    W.Rent,
+                    W.Buy,
+                    W.Rent_Price,
+                    W.Buy_Price,
+                    W.Bridal_Veil_Length,
+                    W.Bridal_Veil_Fabric_Type,
+                    SC.Name AS Center_Name
+                FROM Wedding_Dress W
+                INNER JOIN Service_Center SC ON W.Center_ID = SC.ID
+                WHERE W.Center_ID = @CenterID
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب فساتين الزفاف الخاصة بالمتجر");
+    }
+}
+
+//  إضافة صور فستان زفاف جديدة
+async function AddWeddingDressImage(req, res) {
+ const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                INSERT INTO Service_Images (Src_Image, Service_Type, Service_ID)
+                VALUES (@Src_Image, 'Wedding Dress', @Service_ID)
+            `);
+
+        res.send("✔ تم إضافة صورة فستان زفاف بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة الصورة");
+    }
+};
+
+//  تعديل صور فستان زفاف 
+async function UpdateWeddingDressImage(req, res) {
+    const imageID = req.params.imageID;
+    const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                UPDATE Service_Images
+                SET 
+                    Src_Image = @Src_Image,
+                    Service_Type = 'Wedding Dress',
+                    Service_ID = @Service_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم تعديل الصورة بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل الصورة");
+    }
+};
+
+//  حذف صور فستان زفاف
+async function DeleteWeddingDressImage(req, res) {
+     const imageID = req.params.imageID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .query(`
+                DELETE FROM Service_Images
+                WHERE ID = @ID AND Service_Type = 'Wedding Dress'
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم حذف صورة فستان بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف الصورة");
+    }
+};
+
+//  عرض صور فستان زفاف
+async function ShowWeddingDressImage(req, res) {
+    const DressID = req.params.DressID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('DressID', sql.Int, DressID)
+            .query(`
+                SELECT 
+                    ID,
+                    Src_Image,
+                    Service_Type,
+                    Service_ID
+                FROM Service_Images
+                WHERE Service_ID = @DressID AND Service_Type = 'Wedding Dress'
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ حدث خطأ أثناء جلب صور الفستان");
+    }
+};
+
+//إضافة بدلة جديدة
+async function AddWeddingSuit(req, res) {
+    const {
+        Fabric_Type,
+        Type,
+        Color,
+        Price,
+        Size,
+        Center_ID
+    } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input("Fabric_Type", sql.VarChar, Fabric_Type)
+            .input("Type", sql.VarChar, Type)
+            .input("Color", sql.VarChar, Color)
+            .input("Price", sql.Money, Price)
+            .input("Size", sql.Int, Size)
+            .input("Center_ID", sql.Int, Center_ID)
+            .query(`
+                INSERT INTO Wedding_Suit (
+                    Fabric_Type, Type, Color, Price, Size, Center_ID
+                ) VALUES (
+                    @Fabric_Type, @Type, @Color, @Price, @Size, @Center_ID
+                )
+            `);
+
+        res.send("✔ تم إضافة بدلة الزفاف بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة بدلة الزفاف");
+    }
+}
+
+//تعديل بدلة الزفاف
+async function UpdateWeddingSuit(req, res) {
+    const suitID = req.params.suitID;
+
+    const {
+        Fabric_Type,
+        Type,
+        Color,
+        Price,
+        Size,
+        Center_ID
+    } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input("ID", sql.Int, suitID)
+            .input("Fabric_Type", sql.VarChar, Fabric_Type)
+            .input("Type", sql.VarChar, Type)
+            .input("Color", sql.VarChar, Color)
+            .input("Price", sql.Money, Price)
+            .input("Size", sql.Int, Size)
+            .input("Center_ID", sql.Int, Center_ID)
+            .query(`
+                UPDATE Wedding_Suit
+                SET 
+                    Fabric_Type = @Fabric_Type,
+                    Type = @Type,
+                    Color = @Color,
+                    Price = @Price,
+                    Size = @Size,
+                    Center_ID = @Center_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ البدلة غير موجودة");
+
+        res.send("✔ تم تعديل بدلة الزفاف بنجاح");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل بدلة الزفاف");
+    }
+}
+
+//حذف بدلة الزفاف
+async function DeleteWeddingSuit(req, res) {
+    const suitID = req.params.suitID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input("ID", sql.Int, suitID)
+            .query(`
+                DELETE FROM Wedding_Suit WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ البدلة غير موجودة");
+
+        res.send("✔ تم حذف بدلة الزفاف");
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف بدلة الزفاف");
+    }
+}
+
+//عرض جميع بدلات الزفاف
+async function ShowWeddingSuit(req, res) {
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request().query(`
+            SELECT
+                WS.ID,
+                WS.Fabric_Type,
+                WS.Type,
+                WS.Color,
+                WS.Price,
+                WS.Size,
+                SC.Name AS Center_Name
+            FROM Wedding_Suit WS
+            LEFT JOIN Service_Center SC ON WS.Center_ID = SC.ID
+        `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب بدلات الزفاف");
+    }
+}
+
+//عرض جميع بدلات الزفاف لمركز معين
+async function ShowWeddingSuitToServiceCenter(req, res) {
+    const centerID = req.params.centerID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input("CenterID", sql.Int, centerID)
+            .query(`
+                SELECT
+                    WS.ID,
+                    WS.Fabric_Type,
+                    WS.Type,
+                    WS.Color,
+                    WS.Price,
+                    WS.Size,
+                    SC.Name AS Center_Name
+                FROM Wedding_Suit WS
+                INNER JOIN Service_Center SC ON WS.Center_ID = SC.ID
+                WHERE WS.Center_ID = @CenterID
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء جلب بدلات الزفاف الخاصة بالمتجر");
+    }
+}
+
+//  إضافة صور بدلة زفاف جديدة
+async function AddWeddingSuitImage(req, res) {
+ const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        await pool.request()
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                INSERT INTO Service_Images (Src_Image, Service_Type, Service_ID)
+                VALUES (@Src_Image, 'Wedding Suit', @Service_ID)
+            `);
+
+        res.send("✔ تم إضافة صورة بدلة زفاف بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء إضافة الصورة");
+    }
+};
+
+//  تعديل صور بدلة زفاف 
+async function UpdateWeddingSuitImage(req, res) {
+    const imageID = req.params.imageID;
+    const { Src_Image, Service_ID } = req.body;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .input('Src_Image', sql.VarChar, Src_Image)
+            .input('Service_ID', sql.Int, Service_ID)
+            .query(`
+                UPDATE Service_Images
+                SET 
+                    Src_Image = @Src_Image,
+                    Service_Type = 'Wedding Suit',
+                    Service_ID = @Service_ID
+                WHERE ID = @ID
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم تعديل الصورة بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء تعديل الصورة");
+    }
+};
+
+//  حذف صور بدلة زفاف
+async function DeleteWeddingSuitImage(req, res) {
+     const imageID = req.params.imageID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('ID', sql.Int, imageID)
+            .query(`
+                DELETE FROM Service_Images
+                WHERE ID = @ID AND Service_Type = 'Wedding Suit'
+            `);
+
+        if (result.rowsAffected[0] === 0)
+            return res.status(404).send("❌ الصورة غير موجودة");
+
+        res.send("✔ تم حذف صورة البدلة بنجاح");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ خطأ أثناء حذف الصورة");
+    }
+};
+
+//  عرض صور بدلة زفاف
+async function ShowWeddingSuitImage(req, res) {
+    const SuitID = req.params.SuitID;
+
+    try {
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input('SuitID', sql.Int, SuitID)
+            .query(`
+                SELECT 
+                    ID,
+                    Src_Image,
+                    Service_Type,
+                    Service_ID
+                FROM Service_Images
+                WHERE Service_ID = @SuitID AND Service_Type = 'Wedding Suit'
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("❌ حدث خطأ أثناء جلب صور البدلة");
+    }
+};
+
 
 module.exports = {
     AddCar,
@@ -907,5 +2115,54 @@ module.exports = {
     UpdateShoes,
     DeleteShoes,
     ShowAllShoes,
-    ShowAllShoesToServiceCenter
+    ShowAllShoesToServiceCenter,
+
+    AddShoesImage,
+    UpdateShoesImage,
+    DeleteShoesImage,
+    ShowShoesImage,
+
+    AddAccessories,
+    UpdateAccessories,
+    DeleteAccessories,
+    ShowAccessories,
+    ShowAccessoriesToServiceCenter,
+
+    AddAccessoriesImage,
+    UpdateAccessoriesImage,
+    DeleteAccessoriesImage,
+    ShowAccessoriesImage,
+
+    AddDress,
+    UpdateDress,
+    DeleteDress,
+    ShowDress,
+    ShowDressToServiceCenter,
+
+    AddDressImage,
+    UpdateDressImage,
+    DeleteDressImage,
+    ShowDressImage,
+
+    AddWeddingDress,
+    UpdateWeddingDress,
+    DeleteWeddingDress,
+    ShowWeddingDress,
+    ShowWeddingDressToServiceCenter,
+
+    AddWeddingDressImage,
+    UpdateWeddingDressImage,
+    DeleteWeddingDressImage,
+    ShowWeddingDressImage,
+
+    AddWeddingSuit,
+    UpdateWeddingSuit,
+    DeleteWeddingSuit,
+    ShowWeddingSuit,
+    ShowWeddingSuitToServiceCenter,
+
+    AddWeddingSuitImage,
+    UpdateWeddingSuitImage,
+    DeleteWeddingSuitImage,
+    ShowWeddingSuitImage
 };

@@ -1,13 +1,8 @@
 const express = require("express");
-const {
-  signIn,
-  register,
-  getAllUsers,
-} = require("../Controllers/userController");
-
+const { signIn,  register,  getAllUsers,} = require("../Controllers/userController");
 const { AddLounge, UpdateLounge, InActiveLounge, SelectAllLounge, SelectAllLoungeToServiceAdmin, ShowLoungeImage, DeleteLoungeImage, UpdateLoungeImage, AddLoungeImage } = require("../Controllers/LoungeController");
 const { AddCenterType, UpdateCenterType, InActiveCenterType, SelectCenterType, AddServiceCenter, UpdateServiceCenter, InactiveServiceCenter, SelectAllServiceCenter, SelectAllServiceCenterToServiceAdmin, AddServiceCenterImage, DeleteServiceCenterImage, UpdateServiceCenterImage, ShowServiceCenterImage } = require("../Controllers/CenterController");
-const { AddCar, UpdateCar, ShowALLCar , AddCarImage, UpdateCarImage, DeleteCarImage, ShowCarImage, AddFlower, UpdateFlower, ShowAllFlower, ShowFlowerImage, DeleteFlowerImage, UpdateFlowerImage, AddFlowerImage, AddHairModels, UpdateHairModels, DeleteHairModels, ShowHairModels , DeleteFlower, DeleteCar, AddHairModelsImage, UpdateHairModelsImage, DeleteHairModelsImage, ShowHairModelsImage, ShowALLCarToServiceCenter, ShowAllFlowerToServiceCenter, ShowHairModelsToServiceCenter, AddShoes, UpdateShoes, DeleteShoes, ShowAllShoes , ShowAllShoesToServiceCenter } = require("../Controllers/ServiceController");
+const { AddCar, UpdateCar, ShowALLCar , AddCarImage, UpdateCarImage, DeleteCarImage, ShowCarImage, AddFlower, UpdateFlower, ShowAllFlower, ShowFlowerImage, DeleteFlowerImage, UpdateFlowerImage, AddFlowerImage, AddHairModels, UpdateHairModels, DeleteHairModels, ShowHairModels , DeleteFlower, DeleteCar, AddHairModelsImage, UpdateHairModelsImage, DeleteHairModelsImage, ShowHairModelsImage, ShowALLCarToServiceCenter, ShowAllFlowerToServiceCenter, ShowHairModelsToServiceCenter, AddShoes, UpdateShoes, DeleteShoes, ShowAllShoes , ShowAllShoesToServiceCenter, ShowShoesImage, DeleteShoesImage, UpdateShoesImage, AddShoesImage, AddAccessories, UpdateAccessories, DeleteAccessories, ShowAccessories, ShowAccessoriesToServiceCenter, AddAccessoriesImage, UpdateAccessoriesImage, DeleteAccessoriesImage, ShowAccessoriesImage, AddDressImage, UpdateDressImage, DeleteDressImage, ShowDressImage, AddWeddingDress, UpdateWeddingDress, DeleteWeddingDress, ShowWeddingDress, ShowWeddingDressToServiceCenter, AddWeddingDressImage, UpdateWeddingDressImage, DeleteWeddingDressImage, ShowWeddingDressImage, AddWeddingSuit, UpdateWeddingSuit, DeleteWeddingSuit, ShowWeddingSuit, ShowWeddingSuitToServiceCenter, AddWeddingSuitImage, UpdateWeddingSuitImage, DeleteWeddingSuitImage, ShowWeddingSuitImage } = require("../Controllers/ServiceController");
 
 const router = express.Router();
 
@@ -15,7 +10,6 @@ const router = express.Router();
 router.post("/signin", signIn);
 router.get("/getUsers", getAllUsers);
 router.post("/register", register);
-
 
 // Lounge Management Route
 router.post("/AddLounge",AddLounge);
@@ -33,13 +27,13 @@ router.get("/ShowLoungeImage/:loungeID",ShowLoungeImage);
 //Center Type Management Route
 router.post("/AddCenterType",AddCenterType);
 router.put("/UpdateCenterType/:typeID",UpdateCenterType);
-router.put("/InActiveCenterType/:typeID",InActiveCenterType);
+router.put("/DeleteCenterType/:typeID",InActiveCenterType);
 router.get("/SelectCenterType",SelectCenterType);
 
 //Service Center Management Route
 router.post("/AddServiceCenter",AddServiceCenter);
 router.put("/UpdateServiceCenter/:centerID",UpdateServiceCenter);
-router.put("/InactiveServiceCenter/:centerID",InactiveServiceCenter);
+router.put("/DeleteServiceCenter/:centerID",InactiveServiceCenter);
 router.get("/SelectAllServiceCenter",SelectAllServiceCenter);
 router.get("/SelectAllServiceCenterToServiceAdmin/:adminID",SelectAllServiceCenterToServiceAdmin);
 
@@ -93,8 +87,65 @@ router.post("/AddShoes",AddShoes);
 router.put("/UpdateShoes/:shoeID",UpdateShoes);
 router.delete("/DeleteShoes/:shoeID",DeleteShoes);
 router.get("/ShowAllShoes",ShowAllShoes);
-router.get("/ShowAllShoesToServiceCenter/:adminID",ShowAllShoesToServiceCenter);
+router.get("/ShowAllShoesToServiceCenter/:centerID",ShowAllShoesToServiceCenter);
 
+//Shoes Image Management Route
+router.post("/AddShoesImage",AddShoesImage);
+router.put("/UpdateShoesImage/:imageID",UpdateShoesImage);
+router.delete("/DeleteShoesImage/:imageID",DeleteShoesImage);
+router.get("/ShowShoesImage/:ShoesID",ShowShoesImage);
+
+//Accessories Management Route
+router.post("/AddAccessories",AddAccessories);
+router.put("/UpdateAccessories/:accessoryID",UpdateAccessories);
+router.delete("/DeleteAccessories/:accessoryID",DeleteAccessories);
+router.get("/ShowAccessories",ShowAccessories);
+router.get("/ShowAccessoriesToServiceCenter/:CenterID",ShowAccessoriesToServiceCenter);
+
+//Accessories Image Management Route
+router.post("/AddAccessoriesImage",AddAccessoriesImage);
+router.put("/UpdateAccessoriesImage/:imageID",UpdateAccessoriesImage);
+router.delete("/DeleteAccessoriesImage/:imageID",DeleteAccessoriesImage);
+router.get("/ShowAccessoriesImage/:AccessoriesID",ShowAccessoriesImage);
+
+//Dress Management Route
+router.post("/AddDress",AddDress);
+router.put("/UpdateDress/:dressID",UpdateDress);
+router.delete("/DeleteDress/:dressID",DeleteDress);
+router.get("/ShowDress",ShowDress);
+router.get("/ShowDressToServiceCenter/:centerID",ShowDressToServiceCenter);
+
+//Dress Image Management Route
+router.post("/AddDressImage",AddDressImage);
+router.put("/UpdateDressImage/:imageID",UpdateDressImage);
+router.delete("/DeleteDressImage/:imageID",DeleteDressImage);
+router.get("/ShowDressImage/:DressID",ShowDressImage);
+
+//Wedding Dress Management Route
+router.post("/AddWeddingDress",AddWeddingDress);
+router.put("/UpdateWeddingDress/:dressID",UpdateWeddingDress);
+router.delete("/DeleteWeddingDress/:dressID",DeleteWeddingDress);
+router.get("/ShowWeddingDress",ShowWeddingDress);
+router.get("/ShowWeddingDressToServiceCenter/:centerID",ShowWeddingDressToServiceCenter);
+
+//Wedding Dress Image Management Route
+router.post("/AddWeddingDressImage",AddWeddingDressImage);
+router.put("/UpdateWeddingDressImage/:imageID",UpdateWeddingDressImage);
+router.delete("/DeleteWeddingDressImage/:imageID",DeleteWeddingDressImage);
+router.get("/ShowWeddingDressImage/:DressID",ShowWeddingDressImage);
+
+//Wedding Suit Management Route
+router.post("/AddWeddingSuit",AddWeddingSuit);
+router.put("/UpdateWeddingSuit/:suitID",UpdateWeddingSuit);
+router.delete("/DeleteWeddingSuit/:suitID",DeleteWeddingSuit);
+router.get("/ShowWeddingSuit",ShowWeddingSuit);
+router.get("/ShowWeddingSuitToServiceCenter/:centerID",ShowWeddingSuitToServiceCenter);
+
+//Wedding Suit Image Management Route
+router.post("/AddWeddingSuitImage",AddWeddingSuitImage);
+router.put("/UpdateWeddingSuitImage/:imageID",UpdateWeddingSuitImage);
+router.delete("/DeleteWeddingSuitImage/:imageID",DeleteWeddingSuitImage);
+router.get("/ShowWeddingSuitImage/:DressID",ShowWeddingSuitImage);
 
 
 module.exports = router;
